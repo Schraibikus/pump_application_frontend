@@ -1,22 +1,32 @@
 import { useNavigate } from "react-router-dom";
-import { Box, Button } from "@mui/material";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Product } from "../types";
-const API_URL = "http://localhost:5000/api";
+import { Box, Button, CircularProgress } from "@mui/material";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
+import { fetchProducts } from "@/store/modules/products/thunk";
 
 export const MainPage = () => {
   const navigate = useNavigate();
-
-  const [products, setProducts] = useState<Product[]>([]);
-  console.log(products);
+  const dispatch = useAppDispatch();
+  const { products, loading, error } = useAppSelector(
+    (state) => state.products
+  );
+  // console.log(products);
 
   useEffect(() => {
-    axios
-      .get(`${API_URL}/products`)
-      .then((response) => setProducts(response.data))
-      .catch((error) => console.error("Ошибка загрузки:", error));
-  }, []);
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <Box>Error: {error}</Box>;
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -30,11 +40,12 @@ export const MainPage = () => {
           gap: 2,
         }}
       >
-        {products.map(({ name, path, id }) => (
-          <Button key={id} variant="contained" onClick={() => navigate(path)}>
-            {`${id}. ${name}`}
-          </Button>
-        ))}
+        {products &&
+          products.map(({ name, path, id }) => (
+            <Button key={id} variant="contained" onClick={() => navigate(path)}>
+              {name}
+            </Button>
+          ))}
       </Box>
     </Box>
   );

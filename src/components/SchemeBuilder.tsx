@@ -1,21 +1,45 @@
-import { Box, Button, Modal, Typography } from "@mui/material";
-import { useState } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Modal,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { LinkItem, Product } from "../types";
+import { PartItem } from "@/store/modules/products/types";
+import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
+import { fetchProductParts } from "@/store/modules/products/thunk";
 
 export const SchemeBuilder = ({
   schemaSrc,
-  product,
+  productId,
+  productWidth,
+  productDrawing,
+  productName,
 }: {
   schemaSrc: string;
-  product: Product;
+  productId: number;
+  productWidth: number;
+  productDrawing: number;
+  productName: string;
 }) => {
   const [open, setOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<LinkItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PartItem | null>(null);
   const navigate = useNavigate();
 
-  const handleOpen = (item: LinkItem) => {
+  const dispatch = useAppDispatch();
+  const { parts, loading, error } = useAppSelector(
+    (state) => state.productParts
+  );
+
+  useEffect(() => {
+    console.log(`Запрос деталей для продукта: ${productId}`);
+    dispatch(fetchProductParts(productId));
+  }, [dispatch, productId]);
+
+  const handleOpen = (item: PartItem) => {
     setSelectedItem(item);
     setOpen(true);
   };
@@ -23,6 +47,20 @@ export const SchemeBuilder = ({
   const handleClose = () => {
     setOpen(false);
   };
+
+  console.log("Загруженные детали:", parts);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <Box>Error: {error}</Box>;
+  }
 
   return (
     <Box
@@ -42,44 +80,41 @@ export const SchemeBuilder = ({
       </Button>
 
       <Box sx={{ position: "relative", display: "inline-block" }}>
-        <img src={schemaSrc} alt="Scheme" width={`${product.width}%`} />
+        <img src={schemaSrc} alt="Scheme" width={`${productWidth}%`} />
 
-        {product.parts.map((item) =>
-          Object.entries(item.positioning)
-            .filter(
-              ([key, value]) => key.includes("top") && value !== undefined
-            )
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            .map(([_, topValue], index) => {
-              const leftKey = `left${index === 0 ? "" : index + 1}`;
-              const leftValue =
-                item.positioning[leftKey as keyof typeof item.positioning];
+        {parts.map((item) => {
+          const positions = [
+            { top: item.positioning_top, left: item.positioning_left },
+            { top: item.positioning_top2, left: item.positioning_left2 },
+            { top: item.positioning_top3, left: item.positioning_left3 },
+            { top: item.positioning_top4, left: item.positioning_left4 },
+            { top: item.positioning_top5, left: item.positioning_left5 },
+          ];
 
-              return (
-                leftValue !== undefined && (
-                  <Button
-                    key={`${item.id}-${index}`}
-                    onClick={() => handleOpen(item)}
-                    sx={{
-                      position: "absolute",
-                      top: `${topValue}%`,
-                      left: `${leftValue}%`,
-                      bgcolor: "rgba(0, 0, 255, 0.7)",
-                      color: "white",
-                      borderRadius: "5px",
-                      py: "2px",
-                      px: "2px",
-                      minWidth: 30,
-                      fontSize: 20,
-                      "&:hover": { backgroundColor: "rgba(0, 0, 255, 0.9)" },
-                    }}
-                  >
-                    {item.position}
-                  </Button>
-                )
-              );
-            })
-        )}
+          return positions
+            .filter((pos) => pos.top != null && pos.left != null)
+            .map((pos, index) => (
+              <Button
+                key={`${item.id}-${index}`}
+                onClick={() => handleOpen(item)}
+                sx={{
+                  position: "absolute",
+                  top: `${pos.top}%`,
+                  left: `${pos.left}%`,
+                  bgcolor: "rgba(0, 0, 255, 0.7)",
+                  color: "white",
+                  borderRadius: "5px",
+                  py: "2px",
+                  px: "2px",
+                  minWidth: 30,
+                  fontSize: 20,
+                  "&:hover": { backgroundColor: "rgba(0, 0, 255, 0.9)" },
+                }}
+              >
+                {item.position}
+              </Button>
+            ));
+        })}
 
         <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">
           <Box
@@ -124,7 +159,7 @@ export const SchemeBuilder = ({
       </Box>
 
       <Typography sx={{ mt: 1 }}>
-        Рис.{product.drawing} {product.name}
+        Рис.{productDrawing} {productName}
       </Typography>
     </Box>
   );
