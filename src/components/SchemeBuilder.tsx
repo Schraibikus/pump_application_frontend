@@ -1,17 +1,28 @@
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
   CircularProgress,
   Modal,
   Typography,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
 } from "@mui/material";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { PartItem } from "@/store/modules/products/types";
 import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
 import { fetchProductParts } from "@/store/modules/products/thunk";
 import ScrollToTopButton from "./ScrollToTopButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  addPartToOrder,
+  clearOrder,
+  removePartFromOrder,
+} from "@/store/modules/orders/ordersSlice";
+import { createOrder } from "@/store/modules/orders/thunk";
 
 export const SchemeBuilder = ({
   schemaSrc,
@@ -28,15 +39,22 @@ export const SchemeBuilder = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PartItem | null>(null);
-  const navigate = useNavigate();
+  const [orderOpen, setOrderOpen] = useState(false);
+  const [quantity, setQuantity] = useState<number>(1);
 
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   const { parts, loading, error } = useAppSelector(
     (state) => state.productParts
   );
+  const {
+    parts: globalOrderParts,
+    loading: orderLoading,
+    error: orderError,
+  } = useAppSelector((state) => state.orders);
 
   useEffect(() => {
-    // console.log(`Запрос деталей для продукта: ${productId}`);
     dispatch(fetchProductParts(productId));
   }, [dispatch, productId]);
 
@@ -49,9 +67,42 @@ export const SchemeBuilder = ({
     setOpen(false);
   };
 
-  console.log("Загруженные детали:", parts);
+  const handleAddToOrder = () => {
+    if (selectedItem) {
+      const newPart = {
+        ...selectedItem,
+        quantity,
+        parentProductId: productId,
+        productName,
+        productDrawing,
+      };
+      dispatch(addPartToOrder(newPart));
+      setOpen(false);
+    }
+  };
 
-  if (loading) {
+  const handleSubmitOrder = async () => {
+    try {
+      await dispatch(
+        createOrder({
+          id: 0,
+          createdAt: new Date().toISOString(),
+          parts: globalOrderParts,
+        })
+      ).unwrap();
+      alert("Заказ успешно отправлен!");
+      dispatch(clearOrder());
+      setOrderOpen(false);
+    } catch (error) {
+      console.error("Ошибка при отправке заказа:", error);
+    }
+  };
+
+  const handleRemoveFromOrder = (id: number) => {
+    dispatch(removePartFromOrder(id));
+  };
+
+  if (loading || orderLoading) {
     return (
       <Box sx={{ display: "flex" }}>
         <CircularProgress />
@@ -59,8 +110,8 @@ export const SchemeBuilder = ({
     );
   }
 
-  if (error) {
-    return <Box>Error: {error}</Box>;
+  if (error || orderError) {
+    return <Box>Error: {error || orderError}</Box>;
   }
 
   return (
@@ -78,6 +129,13 @@ export const SchemeBuilder = ({
         sx={{ m: 2, alignSelf: "flex-start" }}
       >
         На главную страницу
+      </Button>
+      <Button
+        variant="contained"
+        onClick={() => setOrderOpen(true)}
+        sx={{ m: 2, alignSelf: "flex-start" }}
+      >
+        Просмотреть заказ
       </Button>
       <ScrollToTopButton />
       <Box sx={{ mt: 2 }}>
@@ -151,10 +209,24 @@ export const SchemeBuilder = ({
                       Описание: {selectedItem.description}
                     </Typography>
                   )}
-                  <Typography>Количество: {selectedItem.quantity}</Typography>
+                  <TextField
+                    label="Количество"
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    sx={{ mt: 2 }}
+                  />
                   <Button
                     variant="contained"
                     color="primary"
+                    onClick={handleAddToOrder}
+                    sx={{ mt: 2, mr: 2 }}
+                  >
+                    Добавить в заказ
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
                     onClick={handleClose}
                     sx={{ mt: 2 }}
                   >
@@ -164,11 +236,45 @@ export const SchemeBuilder = ({
               )}
             </Box>
           </Modal>
-        </Box>
 
-        <Typography sx={{ mt: 1 }}>
-          Рис.{productDrawing} {productName}
-        </Typography>
+          <Modal open={orderOpen} onClose={() => setOrderOpen(false)}>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="h6">Ваш заказ</Typography>
+              <List>
+                {globalOrderParts.map((part) => (
+                  <ListItem key={part.id}>
+                    <ListItemText
+                      primary={`${part.name} (${part.designation})`}
+                      secondary={`Количество: ${part.quantity}`}
+                    />
+                    <IconButton onClick={() => handleRemoveFromOrder(part.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItem>
+                ))}
+              </List>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmitOrder}
+              >
+                Отправить заказ
+              </Button>
+            </Box>
+          </Modal>
+        </Box>
       </Box>
     </Box>
   );

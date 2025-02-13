@@ -32,7 +32,7 @@ export interface PartItem {
 }
 
 export interface Order {
-  id: number;
+  orderId: number;
   createdAt: string;
   parts: PartItem[];
 }

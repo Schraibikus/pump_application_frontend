@@ -1,7 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchProductPartsApi, fetchProductsApi } from "@/store/modules/products/apis"; 
-import { PartItem, Product } from "@/store/modules/products/types";
 import { AxiosError } from "axios";
+import {
+  fetchProductPartsApi,
+  fetchProductsApi,
+} from "@/store/modules/products/apis";
+import { PartItem, Product } from "@/store/modules/products/types";
 
 // Асинхронный чанк для получения списка продуктов
 export const fetchProducts = createAsyncThunk<Product[], void, { rejectValue: string }>(

@@ -6,6 +6,7 @@ import { Layout } from "./Layout/Layout";
 import { MainPage } from "./pages/MainPage";
 import { useAppDispatch, useAppSelector } from "./hooks/useReduxHooks";
 import { fetchProducts } from "./store/modules/products/thunk";
+import { OrdersPage } from "./pages/OrdersPage";
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -28,12 +29,14 @@ const App = () => {
                 schemaSrc={src}
                 productId={id}
                 productWidth={width}
-                productDrawing={drawing}
+                productDrawing={drawing || 0}
                 productName={name}
               />
             }
           />
         ))}
+        <Route path="*" element={<h1>404</h1>} />
+        <Route path="/orders" element={<OrdersPage />} />
       </Route>
     </Routes>
   );
