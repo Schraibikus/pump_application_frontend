@@ -26,8 +26,8 @@ const OrderModal = ({
   onSubmit,
   onRemove,
 }: OrderModalProps) => {
-
   const hasParts = parts && parts.length > 0;
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box

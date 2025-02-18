@@ -65,22 +65,10 @@ export const SchemeBuilder = ({
   if (error) return <Box>Ошибка: {error}</Box>;
 
   return (
-    // <Box
-    //   sx={{
-    //     display: "flex",
-    //     alignItems: "center",
-    //     width: "95%",
-    //     maxWidth: 1440,
-    //     mx: "auto",
-    //     mt: 4,
-    //     gap: 1,
-    //   }}
-    // >
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
-        // flexDirection: "column",
         textAlign: "center",
         mt: 2,
       }}
@@ -113,7 +101,7 @@ export const SchemeBuilder = ({
           sx={{
             position: "relative",
             display: "inline-block",
-            // transform: "translate(-10%)",
+            border: "2px solid rgba(0, 0, 255, 0.7)",
           }}
         >
           <img src={schemaSrc} alt="Scheme" width={`${productWidth}%`} />
@@ -170,7 +158,6 @@ export const SchemeBuilder = ({
         onRemove={(id) => dispatch(removePartFromOrder(id))}
       />
     </Box>
-    // </Box>
   );
 };
 
