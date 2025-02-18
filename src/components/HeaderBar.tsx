@@ -1,4 +1,4 @@
-import { Box, Grid2, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -47,43 +47,36 @@ export const HeaderBar = () => {
       sx={{
         pt: 2,
         width: "100%",
-        m: "0 auto",
+        mx: "auto",
         boxSizing: "border-box",
         position: "fixed",
         top: 0,
         height: 70,
         zIndex: 50,
         backgroundImage: "url(/png/tile_background.png)",
-        borderBottom: "2px solid rgba(0, 0, 255, 0.7)",
+        // borderBottom: "2px solid rgba(0, 0, 255, 0.7)",
       }}
     >
-      <>
-        <Grid2
-          container
-          size={12}
-          spacing={{ xl: 12, lg: 5, md: 2.5, sm: 2, xs: 2 }}
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Tabs
+          value={tabValue} // Начальное значение
+          onChange={handleTabChange}
+          aria-label="Tabs for HeaderBar"
+          variant="standard"
+          sx={{
+            "& .MuiTabs-flexContainer": {
+              gap: "20px", // Расстояние между табами
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: "rgba(0, 0, 255, 0.7)",
+            },
+          }}
         >
-          <Grid2
-            size={12}
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <Tabs
-              value={tabValue} // Начальное значение
-              onChange={handleTabChange}
-              aria-label="Tabs for HeaderBar"
-              variant="standard"
-            >
-              <Tab label="На главную" />
-              <Tab label="Изделия" />
-              <Tab label="Заказы" />
-            </Tabs>
-          </Grid2>
-        </Grid2>
-      </>
+          <Tab label="На главную" />
+          <Tab label="Изделия" />
+          <Tab label="Заказы" />
+        </Tabs>
+      </Box>
     </Box>
   );
 };
