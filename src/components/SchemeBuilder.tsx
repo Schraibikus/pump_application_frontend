@@ -34,12 +34,16 @@ export const SchemeBuilder = ({
   const dispatch = useAppDispatch();
   const submitOrder = useSubmitOrder();
 
+  
   const { parts, loading, error } = useProductParts(productId);
+  console.log("parts", parts);
   const globalOrderParts = useAppSelector((state) => state.orders.parts);
+  console.log("globalOrderParts", globalOrderParts);
+
+  const hasOrder = globalOrderParts && globalOrderParts.length > 0;
 
   const handleOpen = (item: PartItem) => {
     setSelectedItem(item);
-    // setOpen(true);
   };
 
   const handleAddToOrder = (quantity: number) => {
@@ -58,34 +62,60 @@ export const SchemeBuilder = ({
   };
 
   if (loading) return <CircularProgress />;
-  if (error) return <Box>Error: {error}</Box>;
+  if (error) return <Box>Ошибка: {error}</Box>;
 
   return (
+    // <Box
+    //   sx={{
+    //     display: "flex",
+    //     alignItems: "center",
+    //     width: "95%",
+    //     maxWidth: 1440,
+    //     mx: "auto",
+    //     mt: 4,
+    //     gap: 1,
+    //   }}
+    // >
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+        justifyContent: "center",
+        // flexDirection: "column",
         textAlign: "center",
+        mt: 2,
       }}
     >
-      <Button
-        variant="contained"
-        onClick={() => navigate("/")}
-        sx={{ m: 2, alignSelf: "flex-start" }}
+      <Box
+        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       >
-        На главную страницу
-      </Button>
-      <Button
-        variant="contained"
-        onClick={() => setOrderOpen(true)}
-        sx={{ m: 2, alignSelf: "flex-start" }}
-      >
-        Просмотреть заказ
-      </Button>
-      <ScrollToTopButton />
-      <Box sx={{ mt: 2 }}>
-        <Box sx={{ position: "relative", display: "inline-block" }}>
+        <Button
+          variant="contained"
+          onClick={() => navigate("/")}
+          sx={{ m: 2, alignSelf: "flex-start", whiteSpace: "nowrap" }}
+        >
+          На главную страницу
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() => setOrderOpen(true)}
+          sx={{ m: 2, alignSelf: "flex-start" }}
+          disabled={!hasOrder}
+        >
+          Просмотреть заказ
+        </Button>
+
+        <ScrollToTopButton />
+      </Box>
+
+      <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            position: "relative",
+            display: "inline-block",
+            // transform: "translate(-10%)",
+          }}
+        >
           <img src={schemaSrc} alt="Scheme" width={`${productWidth}%`} />
           {parts.map((item) => {
             const positions = [
@@ -140,6 +170,7 @@ export const SchemeBuilder = ({
         onRemove={(id) => dispatch(removePartFromOrder(id))}
       />
     </Box>
+    // </Box>
   );
 };
 

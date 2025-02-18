@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 import { useAppDispatch } from "@/hooks/useReduxHooks";
 import { createOrder } from "@/store/modules/orders/thunk";
 import { clearOrder } from "@/store/modules/orders/ordersSlice";
@@ -15,7 +17,7 @@ export const useSubmitOrder = () => {
           parts,
         })
       ).unwrap();
-      alert("Заказ успешно отправлен!");
+      toast.success("Заказ успешно отправлен!");
       dispatch(clearOrder());
       onSuccess();
     } catch (error) {

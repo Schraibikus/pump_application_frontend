@@ -26,6 +26,8 @@ const OrderModal = ({
   onSubmit,
   onRemove,
 }: OrderModalProps) => {
+
+  const hasParts = parts && parts.length > 0;
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -55,7 +57,12 @@ const OrderModal = ({
             </ListItem>
           ))}
         </List>
-        <Button variant="contained" color="primary" onClick={onSubmit}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={onSubmit}
+          disabled={!hasParts}
+        >
           Отправить заказ
         </Button>
       </Box>
