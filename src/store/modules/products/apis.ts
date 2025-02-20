@@ -1,6 +1,6 @@
 import axios from "axios";
 import { api } from "@/store/axios";
-import { PartItem, Product } from "@/store/modules/products/types";
+import { PartItem, Product } from "@/types";
 
 export const fetchProductsApi = async (): Promise<Product[]> => {
   try {

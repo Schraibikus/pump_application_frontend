@@ -1,6 +1,6 @@
 import axios from "axios";
 import { api } from "@/store/axios";
-import { PartItem } from "@/store/modules/products/types";
+import { PartItem } from "@/types";
 
 export const fetchProductPartsApi = async (
   productId: number

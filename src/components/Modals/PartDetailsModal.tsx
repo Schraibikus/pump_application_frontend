@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
-import { PartItem } from "@/store/modules/products/types";
+import { PartItem } from "@/types";
 
 interface PartDetailsModalProps {
   open: boolean;
@@ -16,6 +16,17 @@ const PartDetailsModal = ({
   onAddToOrder,
 }: PartDetailsModalProps) => {
   const [quantity, setQuantity] = useState<number>(1);
+
+  useEffect(() => {
+    if (open) {
+      setQuantity(1);
+    }
+  }, [open]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10);
+    setQuantity(value >= 0 ? value : 0); // Предотвращаем отрицательные значения
+  };
 
   if (!part) return null;
 
@@ -34,7 +45,7 @@ const PartDetailsModal = ({
           borderRadius: 2,
         }}
       >
-        <Typography variant="h6">{part.name}</Typography>
+        <Typography>Наименование: {part.name}</Typography>
         {part.designation && (
           <Typography>Обозначение: {part.designation}</Typography>
         )}
@@ -42,10 +53,11 @@ const PartDetailsModal = ({
           <Typography>Описание: {part.description}</Typography>
         )}
         <TextField
+          variant="outlined"
           label="Количество"
           type="number"
           value={quantity}
-          onChange={(e) => setQuantity(Number(e.target.value))}
+          onChange={handleChange}
           sx={{ mt: 2 }}
         />
         <Button

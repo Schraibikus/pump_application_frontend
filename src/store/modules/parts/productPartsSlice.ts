@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchProductParts } from "@/store/modules/parts/thunk";
-import { PartItem } from "@/store/modules/parts/types";
+import { PartItem } from "@/types";
 
 interface ProductPartsState {
   parts: PartItem[];

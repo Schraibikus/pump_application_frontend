@@ -9,7 +9,7 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { PartItem } from "@/store/modules/products/types";
+import { PartItem } from "@/types";
 
 interface OrderModalProps {
   open: boolean;
@@ -28,6 +28,8 @@ const OrderModal = ({
 }: OrderModalProps) => {
   const hasParts = parts && parts.length > 0;
 
+  // console.log(parts);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -36,19 +38,24 @@ const OrderModal = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: 600,
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
         }}
       >
-        <Typography variant="h6">Ваш заказ</Typography>
+        <Typography>Ваш заказ</Typography>
         <List>
           {parts.map((part) => (
             <ListItem key={part.id}>
               <ListItemText
-                primary={`${part.name} (${part.designation})`}
+                primary={
+                  <>
+                    {`Изделие: ${part.productName}`} <br />
+                    {`Наименование: ${part.name} ${part.designation ? part.designation : ""}`}
+                  </>
+                }
                 secondary={`Количество: ${part.quantity}`}
               />
               <IconButton onClick={() => onRemove(part.id)}>

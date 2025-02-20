@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { Order } from "@/store/modules/orders/types";
+import { Order } from "@/types";
 import {
   createOrdersApi,
   fetchOrdersApi,

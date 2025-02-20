@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchProductPartsApi} from "@/store/modules/products/apis"; 
-import { PartItem } from "@/store/modules/products/types";
+import { PartItem } from "@/types";
 import { AxiosError } from "axios";
 
 export const fetchProductParts = createAsyncThunk<PartItem[], number>(

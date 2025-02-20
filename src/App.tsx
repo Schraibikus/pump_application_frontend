@@ -7,10 +7,12 @@ import { MainPage } from "./pages/MainPage";
 import { useAppDispatch, useAppSelector } from "./hooks/useReduxHooks";
 import { fetchProducts } from "./store/modules/products/thunk";
 import { OrdersPage } from "./pages/OrdersPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 const App = () => {
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.products.products);
+  // console.log(products);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -35,8 +37,8 @@ const App = () => {
             }
           />
         ))}
-        <Route path="*" element={<h1>404</h1>} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );

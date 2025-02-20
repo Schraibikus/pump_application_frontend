@@ -1,31 +1,45 @@
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress } from "@mui/material";
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
-import { fetchProducts } from "@/store/modules/products/thunk";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { useAppSelector } from "@/hooks/useReduxHooks";
 
 export const MainPage = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const { products, loading, error } = useAppSelector(
     (state) => state.products
   );
   // console.log(products);
 
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
-
   if (loading) {
     return (
-      <Box sx={{ display: "flex" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 4,
+          gap: 2,
+        }}
+      >
         <CircularProgress />
+        <Typography>{"Загрузка изделий..."}</Typography>
       </Box>
     );
   }
 
   if (error) {
-    return <Box>Error: {error}</Box>;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 4,
+          gap: 2,
+        }}
+      >
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
   }
 
   return (
