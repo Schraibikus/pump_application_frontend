@@ -1,8 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { Order } from "@/types";
 import {
   createOrdersApi,
+  deleteOrdersApi,
   fetchOrdersApi,
   fetchSingleOrderApi,
 } from "@/store/modules/orders/apis";
@@ -43,12 +44,33 @@ export const createOrder = createAsyncThunk(
   async (order: Order, { rejectWithValue }) => {
     try {
       const data = await createOrdersApi(order);
-      return data; 
+      return data;
     } catch (error) {
       if (error instanceof AxiosError) {
         return rejectWithValue(error.response?.data?.message);
       }
       return rejectWithValue("Неизвестная ошибка.");
+    }
+  }
+);
+
+export const deleteOrder = createAsyncThunk(
+  "orders/deleteOrder",
+  async (orderId: number, { rejectWithValue }) => {
+    try {
+      const isDeleted = await deleteOrdersApi(orderId);
+      if (!isDeleted) {
+        // Если удаление не удалось, возвращаем ошибку
+        return rejectWithValue({ message: "Не удалось удалить заказ" });
+      }
+      return orderId; // Возвращаем ID удалённого заказа
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Возвращаем ошибку с данными от сервера
+        return rejectWithValue(error.response?.data);
+      }
+      // Возвращаем неизвестную ошибку
+      return rejectWithValue({ message: "Неизвестная ошибка" });
     }
   }
 );

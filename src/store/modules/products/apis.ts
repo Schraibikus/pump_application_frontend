@@ -4,7 +4,7 @@ import { PartItem, Product } from "@/types";
 
 export const fetchProductsApi = async (): Promise<Product[]> => {
   try {
-    const { data } = await api.get<Product[]>("/products");
+    const { data } = await api.get<Product[]>("/api/products");
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -24,7 +24,9 @@ export const fetchProductPartsApi = async (
   productId: number
 ): Promise<PartItem[]> => {
   try {
-    const { data } = await api.get<PartItem[]>(`/products/${productId}/parts`);
+    const { data } = await api.get<PartItem[]>(
+      `/api/products/${productId}/parts`
+    );
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

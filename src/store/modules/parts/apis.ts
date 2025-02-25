@@ -6,7 +6,9 @@ export const fetchProductPartsApi = async (
   productId: number
 ): Promise<PartItem[]> => {
   try {
-    const { data } = await api.get<PartItem[]>(`/products/${productId}/parts`);
+    const { data } = await api.get<PartItem[]>(
+      `/api/products/${productId}/parts`
+    );
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

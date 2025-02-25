@@ -3,16 +3,29 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
 import { fetchOrders } from "@/store/modules/orders/thunk";
 import { ActiveOrdersEmpty } from "./ActiveOrdersEmpty";
+import { deleteOrder } from "@/store/modules/orders/thunk";
 
 export const OrdersPage = () => {
   const dispatch = useAppDispatch();
   const { orders, loading, error } = useAppSelector((state) => state.orders);
-  console.log("orders", orders);
-  const [openOrderId, setOpenOrderId] = useState<number | null>(null); // Храним ID раскрытого заказа
+  const [openOrderId, setOpenOrderId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
+
+  const handleDeleteOrder = async (orderId: number) => {
+    try {
+      await dispatch(deleteOrder(orderId)).unwrap();
+      console.log("Заказ успешно удалён");
+      // Закрываем раскрытый заказ, если он был удалён
+      if (openOrderId === orderId) {
+        setOpenOrderId(null);
+      }
+    } catch (error) {
+      console.error("Ошибка при удалении заказа:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -62,15 +75,27 @@ export const OrdersPage = () => {
         {orders && orders.length > 0 ? (
           orders.map((order, index) => (
             <Box key={index}>
-              <Button
-                variant="contained"
-                onClick={() =>
-                  setOpenOrderId(openOrderId === order.id ? null : order.id)
-                } // Открывает/закрывает список деталей
-              >
-                Заказ № {order.id} создан{" "}
-                {new Date(order.createdAt).toLocaleString()}
-              </Button>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    setOpenOrderId(openOrderId === order.id ? null : order.id)
+                  }
+                >
+                  Заказ № {order.id} создан{" "}
+                  {new Date(order.createdAt).toLocaleString()}
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Предотвращаем всплытие события
+                    handleDeleteOrder(order.id);
+                  }}
+                >
+                  Удалить
+                </Button>
+              </Box>
               {openOrderId === order.id && (
                 <Box
                   key={order.id}

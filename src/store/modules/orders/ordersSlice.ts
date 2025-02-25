@@ -1,9 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Order, PartItem } from "@/types";
-import { createOrder, fetchOrders, fetchSingleOrder } from "@/store/modules/orders/thunk";
+import {
+  createOrder,
+  deleteOrder,
+  fetchOrders,
+  fetchSingleOrder,
+} from "@/store/modules/orders/thunk";
 
 interface OrdersState {
-  orders: Order[] | []; 
+  orders: Order[] | [];
   singleOrder: Order | null;
   parts: PartItem[];
   loading: boolean;
@@ -84,6 +89,26 @@ const ordersSlice = createSlice({
         state.loading = false;
         state.error =
           (action.payload as string) || "Ошибка загрузки данных заказа";
+      });
+    // Удаление заказа
+    builder
+      .addCase(deleteOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        deleteOrder.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          state.loading = false;
+          // Удаляем заказ из списка
+          state.orders = state.orders.filter(
+            (order) => order.id !== action.payload
+          );
+        }
+      )
+      .addCase(deleteOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = (action.payload as string) || "Ошибка удаления заказа";
       });
   },
 });
