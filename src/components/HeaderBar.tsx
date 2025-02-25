@@ -14,11 +14,14 @@ export const HeaderBar = () => {
       case "/":
         setTabValue(0);
         break;
-      case "/products":
+      case "/1":
         setTabValue(1);
         break;
-      case "/orders":
+      case "/2":
         setTabValue(2);
+        break;
+      case "/orders":
+        setTabValue(3);
         break;
       default:
         setTabValue(0); // По умолчанию выбираем первую вкладку
@@ -32,9 +35,12 @@ export const HeaderBar = () => {
         navigate("/");
         break;
       case 1:
-        navigate("/products");
+        navigate("/1");
         break;
       case 2:
+        navigate("/2");
+        break;
+      case 3:
         navigate("/orders");
         break;
       default:
@@ -73,7 +79,8 @@ export const HeaderBar = () => {
           }}
         >
           <Tab label="На главную" />
-          <Tab label="Изделия" />
+          <Tab label="Изделиe 1" />
+          <Tab label="Изделиe 2" />
           <Tab label="Заказы" />
         </Tabs>
       </Box>

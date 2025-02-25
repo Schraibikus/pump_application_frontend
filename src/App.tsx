@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "./hooks/useReduxHooks";
 import { fetchProducts } from "./store/modules/products/thunk";
 import { OrdersPage } from "./pages/OrdersPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { ProductGroupPage } from "./pages/ProductGroupPage";
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -22,10 +23,10 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<MainPage />} />
-        {products.map(({ path, id, src, width, drawing, name }) => (
+        {products.map(({ path, id, src, width, drawing, name, head }) => (
           <Route
             key={id}
-            path={`/${path}`}
+            path={`/${head}/${path}`}
             element={
               <SchemeBuilder
                 schemaSrc={src}
@@ -33,10 +34,12 @@ const App = () => {
                 productWidth={width}
                 productDrawing={drawing || 0}
                 productName={name}
+                productHead={head}
               />
             }
           />
         ))}
+        <Route path="/:head" element={<ProductGroupPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

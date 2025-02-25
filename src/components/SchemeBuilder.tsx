@@ -20,12 +20,14 @@ export const SchemeBuilder = ({
   productWidth,
   productDrawing,
   productName,
+  productHead,
 }: {
   schemaSrc: string;
   productId: number;
   productWidth: number;
   productDrawing: number;
   productName: string;
+  productHead: number;
 }) => {
   const [selectedItem, setSelectedItem] = useState<PartItem | null>(null);
   const [orderOpen, setOrderOpen] = useState(false);
@@ -34,7 +36,6 @@ export const SchemeBuilder = ({
   const dispatch = useAppDispatch();
   const submitOrder = useSubmitOrder();
 
-  
   const { parts, loading, error } = useProductParts(productId);
   // console.log("parts", parts);
   const globalOrderParts = useAppSelector((state) => state.orders.parts);
@@ -83,10 +84,10 @@ export const SchemeBuilder = ({
       >
         <Button
           variant="contained"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(`/${productHead}`)}
           sx={{ m: 2, alignSelf: "flex-start", whiteSpace: "nowrap" }}
         >
-          На главную страницу
+          На страницу изделия
         </Button>
 
         <Button
@@ -106,7 +107,6 @@ export const SchemeBuilder = ({
           sx={{
             position: "relative",
             display: "inline-block",
-            border: "2px solid rgba(0, 0, 255, 0.7)",
           }}
         >
           <img src={schemaSrc} alt="Scheme" width={`${productWidth}%`} />

@@ -7,7 +7,6 @@ export const MainPage = () => {
   const { products, loading, error } = useAppSelector(
     (state) => state.products
   );
-  // console.log(products);
 
   if (loading) {
     return (
@@ -42,24 +41,66 @@ export const MainPage = () => {
     );
   }
 
+  // Разделяем изделия по группам
+  const productsHead1 = products.filter((product) => product.head === 1);
+  const productsHead2 = products.filter((product) => product.head === 2);
+
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{ display: "flex", justifyContent: "center", gap: 4, p: 4, mt: 2 }}
+    >
+      {/* Колонка с изделиями head: 1 */}
       <Box
         sx={{
-          p: 4,
-          mt: 2,
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
           gap: 2,
+          border: "1px solid rgba(0, 0, 255, 0.7)",
+          p: 1,
         }}
       >
-        {products &&
-          products.map(({ name, path, id }) => (
-            <Button key={id} variant="contained" onClick={() => navigate(path)}>
+        {/* <Typography variant="h6">Группа 1</Typography> */}
+        {productsHead1.length > 0 ? (
+          productsHead1.map(({ name, path, id, head }) => (
+            <Button
+              key={id}
+              variant="contained"
+              onClick={() => navigate(`/${head}/${path}`)}
+            >
               {name}
             </Button>
-          ))}
+          ))
+        ) : (
+          <Typography color="textSecondary">Нет изделий</Typography>
+        )}
+      </Box>
+
+      {/* Колонка с изделиями head: 2 */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: 2,
+          border: "1px solid rgba(0, 0, 255, 0.7)",
+          p: 1,
+        }}
+      >
+        {/* <Typography variant="h6">Группа 2</Typography> */}
+        {productsHead2.length > 0 ? (
+          productsHead2.map(({ name, path, id, head }) => (
+            <Button
+              key={id}
+              variant="contained"
+              onClick={() => navigate(`/${head}/${path}`)}
+            >
+              {name}
+            </Button>
+          ))
+        ) : (
+          <Typography color="textSecondary">Нет изделий</Typography>
+        )}
       </Box>
     </Box>
   );
