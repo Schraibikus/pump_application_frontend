@@ -1,9 +1,22 @@
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+import { Fragment, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
-import { fetchOrders } from "@/store/modules/orders/thunk";
+import { fetchOrders, deleteOrder } from "@/store/modules/orders/thunk";
 import { ActiveOrdersEmpty } from "./ActiveOrdersEmpty";
-import { deleteOrder } from "@/store/modules/orders/thunk";
+import { toast } from "react-toastify";
+import { exportOrderToPdf } from "@/utils/exportOrderToPdf";
 
 export const OrdersPage = () => {
   const dispatch = useAppDispatch();
@@ -15,15 +28,18 @@ export const OrdersPage = () => {
   }, [dispatch]);
 
   const handleDeleteOrder = async (orderId: number) => {
-    try {
-      await dispatch(deleteOrder(orderId)).unwrap();
-      console.log("Заказ успешно удалён");
-      // Закрываем раскрытый заказ, если он был удалён
-      if (openOrderId === orderId) {
-        setOpenOrderId(null);
+    if (window.confirm("Вы уверены, что хотите удалить этот заказ?")) {
+      try {
+        await dispatch(deleteOrder(orderId)).unwrap();
+        console.log("Заказ успешно удалён");
+        toast.success("Заказ успешно удалён");
+        if (openOrderId === orderId) {
+          setOpenOrderId(null);
+        }
+      } catch (error) {
+        console.error("Ошибка при удалении заказа:", error);
+        toast.error("Ошибка при удалении заказа");
       }
-    } catch (error) {
-      console.error("Ошибка при удалении заказа:", error);
     }
   };
 
@@ -39,7 +55,7 @@ export const OrdersPage = () => {
         }}
       >
         <CircularProgress />
-        <Typography>{"Загрузка заказов..."}</Typography>
+        <Typography>Загрузка заказов...</Typography>
       </Box>
     );
   }
@@ -73,8 +89,8 @@ export const OrdersPage = () => {
         }}
       >
         {orders && orders.length > 0 ? (
-          orders.map((order, index) => (
-            <Box key={index}>
+          orders.map((order) => (
+            <Box key={order.id} sx={{ width: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Button
                   variant="contained"
@@ -87,48 +103,89 @@ export const OrdersPage = () => {
                 </Button>
                 <Button
                   variant="contained"
-                  color="error"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Предотвращаем всплытие события
-                    handleDeleteOrder(order.id);
-                  }}
+                  color="success"
+                  onClick={() =>
+                    exportOrderToPdf(order, `order_${order.id}.pdf`)
+                  }
                 >
-                  Удалить
+                  Экспорт в PDF
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => handleDeleteOrder(order.id)}
+                >
+                  Удалить заказ
                 </Button>
               </Box>
+
               {openOrderId === order.id && (
                 <Box
-                  key={order.id}
                   sx={{
                     border: "1px solid #ccc",
                     borderRadius: 2,
-                    mt: 1,
+                    mt: 2,
+                    width: "100%",
                   }}
                 >
                   {order.parts.length > 0 ? (
-                    order.parts.map((part) => (
-                      <Box
-                        key={part.id}
-                        sx={{ p: 1, borderBottom: "1px solid #ddd" }}
-                      >
-                        <Typography>🔹 Изделие: {part.productName}</Typography>
-                        <Typography>🔹 Название: {part.name}</Typography>
-                        <Typography>📦 Позиция: {part.position}</Typography>
-                        {part.designation && (
-                          <Typography>
-                            📝 Описание: {part.designation}
-                          </Typography>
-                        )}
-                        {part.description && (
-                          <Typography>
-                            📝 Описание: {part.description}
-                          </Typography>
-                        )}
-                        <Typography>🔢 Количество: {part.quantity}</Typography>
-                      </Box>
-                    ))
+                    <TableContainer component={Paper}>
+                      <Table>
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              Наименование
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              Обозначение
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>
+                              Кол-во
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {Object.entries(
+                            order.parts.reduce(
+                              (acc, part) => {
+                                if (!acc[part.productName])
+                                  acc[part.productName] = [];
+                                acc[part.productName].push(part);
+                                return acc;
+                              },
+                              {} as Record<string, typeof order.parts>
+                            )
+                          ).map(([productName, parts]) => (
+                            <Fragment key={productName}>
+                              {/* Заголовок группы */}
+                              <TableRow
+                                key={productName}
+                                sx={{ backgroundColor: "#e0e0e0" }}
+                              >
+                                <TableCell
+                                  colSpan={3}
+                                  sx={{ fontWeight: "bold" }}
+                                >
+                                  {productName}:
+                                </TableCell>
+                              </TableRow>
+                              {/* Детали внутри группы */}
+                              {parts.map((part) => (
+                                <TableRow key={part.id}>
+                                  <TableCell>{part.name}</TableCell>
+                                  <TableCell>
+                                    {part.designation || "—"}
+                                  </TableCell>
+                                  <TableCell>{part.quantity}</TableCell>
+                                </TableRow>
+                              ))}
+                            </Fragment>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                   ) : (
-                    <Typography>Нет деталей в заказе</Typography>
+                    <Typography sx={{ p: 2 }}>Нет деталей в заказе</Typography>
                   )}
                 </Box>
               )}
