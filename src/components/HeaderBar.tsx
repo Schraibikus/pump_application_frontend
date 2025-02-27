@@ -10,21 +10,25 @@ export const HeaderBar = () => {
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
-    switch (location.pathname) {
-      case "/":
-        setTabValue(0);
-        break;
-      case "/1":
-        setTabValue(1);
-        break;
-      case "/2":
-        setTabValue(2);
-        break;
-      case "/orders":
-        setTabValue(3);
-        break;
-      default:
-        setTabValue(0); // По умолчанию выбираем первую вкладку
+    if (location.pathname.startsWith("/1")) {
+      setTabValue(1);
+    } else {
+      switch (location.pathname) {
+        case "/":
+          setTabValue(0);
+          break;
+        case "/1/":
+          setTabValue(1);
+          break;
+        case "/2":
+          setTabValue(2);
+          break;
+        case "/orders":
+          setTabValue(3);
+          break;
+        default:
+          setTabValue(0); // По умолчанию выбираем первую вкладку
+      }
     }
   }, [location.pathname]);
 

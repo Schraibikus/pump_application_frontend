@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  MenuItem,
+  Modal,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { PartItem } from "@/types";
 
 interface PartDetailsModalProps {
@@ -28,6 +37,19 @@ const PartDetailsModal = ({
     setQuantity(value >= 0 ? value : 0); // Предотвращаем отрицательные значения
   };
 
+  const [selectedPart, setSelectedPart] = useState<string>("");
+  const handlePartChange = (value: string) => {
+    setSelectedPart(value);
+    // Если нужно обновить обозначение или другие свойства части
+    if (part?.alternativeSets && part.alternativeSets[value]) {
+      const selectedAlternative = part.alternativeSets[value];
+      // Например, обновляем обозначение
+      const updatedPart = { ...part };
+      updatedPart.designation = selectedAlternative.designation;
+      // Можно обновить и другие свойства, если нужно
+    }
+  };
+
   if (!part) return null;
 
   return (
@@ -45,18 +67,83 @@ const PartDetailsModal = ({
           borderRadius: 2,
         }}
       >
-        <Typography>Наименование: {part.name}</Typography>
-        {part.designation && (
-          <Typography>Обозначение: {part.designation}</Typography>
-        )}
-        {part.description && (
-          <Typography>Описание: {part.description}</Typography>
-        )}
+        <Typography>
+          Наименование:{" "}
+          <Typography component="span" sx={{ fontWeight: 700 }}>
+            {part.name}
+          </Typography>
+        </Typography>
+
+        {part.alternativeSets &&
+          Object.keys(part.alternativeSets).length === 0 &&
+          part.designation && (
+            <Typography>Обозначение: {part.designation}</Typography>
+          )}
+        {part.alternativeSets &&
+          Object.keys(part.alternativeSets).length === 0 &&
+          part.description && (
+            <Typography>Описание: {part.description}</Typography>
+          )}
+
+        {part.designation &&
+          part.alternativeSets &&
+          Object.keys(part.alternativeSets).length > 0 && (
+            <>
+              <Select
+                displayEmpty
+                variant="standard"
+                value={selectedPart}
+                renderValue={(value) => (value ? value : "Переменные данные")}
+                onChange={(e: SelectChangeEvent<string>) => {
+                  const selectedValue = e.target.value;
+                  handlePartChange(selectedValue);
+                }}
+              >
+                {Object.keys(part.alternativeSets).map((setName) => (
+                  <MenuItem key={setName} value={setName}>
+                    {setName}
+                  </MenuItem>
+                ))}
+              </Select>
+              {selectedPart &&
+                part.alternativeSets[selectedPart].designation && (
+                  <Typography>
+                    Обозначение:{" "}
+                    {selectedPart && part.alternativeSets[selectedPart]
+                      ? part.alternativeSets[selectedPart].designation
+                      : part.designation}
+                  </Typography>
+                )}
+              {selectedPart &&
+                part.alternativeSets[selectedPart].description && (
+                  <Typography>
+                    Описание:{" "}
+                    {selectedPart && part.alternativeSets[selectedPart]
+                      ? part.alternativeSets[selectedPart].description
+                      : part.description}
+                  </Typography>
+                )}
+              {selectedPart && part.alternativeSets[selectedPart].drawing && (
+                <Typography>
+                  Рисунок:{" "}
+                  {selectedPart && part.alternativeSets[selectedPart]
+                    ? part.alternativeSets[selectedPart].drawing
+                    : part.description}
+                </Typography>
+              )}
+            </>
+          )}
+
         <TextField
           variant="outlined"
           label="Количество"
           type="number"
           value={quantity}
+          slotProps={{
+            input: {
+              inputProps: { min: 1 },
+            },
+          }}
           onChange={handleChange}
           sx={{ mt: 2 }}
         />

@@ -40,7 +40,7 @@ export const SchemeBuilder = ({
   // console.log("parts:", JSON.stringify(parts, null, 2));
   console.log("parts:", parts);
   const globalOrderParts = useAppSelector((state) => state.orders.parts);
-  // console.log("globalOrderParts", globalOrderParts);
+  console.log("globalOrderParts", globalOrderParts);
   const totalPartsInOrder = globalOrderParts.reduce(
     (sum, part) => sum + part.quantity,
     0

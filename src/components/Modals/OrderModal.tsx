@@ -28,7 +28,7 @@ const OrderModal = ({
 }: OrderModalProps) => {
   const hasParts = parts && parts.length > 0;
 
-  // console.log(parts);
+  console.log(parts);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -53,7 +53,25 @@ const OrderModal = ({
                 primary={
                   <>
                     {`Изделие: ${part.productName}`} <br />
-                    {`Наименование: ${part.name} ${part.designation ? part.designation : ""}`}
+                    {`Наименование: ${part.name}`} <br />
+                    {part.alternativeSets &&
+                    Object.keys(part.alternativeSets).length === 0 &&
+                    part.designation
+                      ? `Обозначение: ${part.designation}`
+                      : `Обозначение: ${part.designation}`}
+                    {part.alternativeSets &&
+                      Object.keys(part.alternativeSets).length === 0 &&
+                      part.description &&
+                      `Описание: ${part.description}`}
+                    {part.alternativeSets &&
+                    Object.keys(part.alternativeSets).length > 0 &&
+                    part.designation
+                      ? `Обозначение: ${part.designation}`
+                      : `Обозначение: ${part.designation}`}
+                    {part.alternativeSets &&
+                      Object.keys(part.alternativeSets).length > 0 &&
+                      part.description &&
+                      `Описание: ${part.description}`}
                   </>
                 }
                 secondary={`Количество: ${part.quantity}`}
