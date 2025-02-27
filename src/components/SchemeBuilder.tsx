@@ -76,7 +76,7 @@ export const SchemeBuilder = ({
         display: "flex",
         justifyContent: "center",
         textAlign: "center",
-        mt: 2,
+        mt: 5,
       }}
     >
       <Box
@@ -129,8 +129,7 @@ export const SchemeBuilder = ({
                     position: "absolute",
                     top: `${pos.top}%`,
                     left: `${pos.left}%`,
-                    bgcolor: "rgba(0, 0, 255, 0.7)",
-                    color: "white",
+                    color: "rgba(0, 0, 255, 0.7)",
                     borderRadius: "5px",
                     py: "2px",
                     px: "2px",

@@ -48,10 +48,16 @@ export const ProductGroupPage = () => {
   );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", p: 4, mt: 2, gap: 2, justifyContent: "start", alignItems: "start" }}>
+    <Box
+      sx={{
+        columnCount: 2,
+        p: 4,
+      }}
+    >
       {filteredProducts.length > 0 ? (
         filteredProducts.map(({ name, path, id, head }) => (
           <Button
+            sx={{ breakInside: "avoid-column", width: "100%", my: 1 }}
             key={id}
             variant="contained"
             onClick={() => navigate(`/${head}/${path}`)}

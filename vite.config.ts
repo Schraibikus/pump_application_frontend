@@ -10,7 +10,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // server: {
+  //   port: 3000,
+  // },
   server: {
+    host: "localhost",
     port: 3000,
   },
   build: {
