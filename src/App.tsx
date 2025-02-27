@@ -26,7 +26,7 @@ const App = () => {
         {products.map(({ path, id, src, width, drawing, name, head }) => (
           <Route
             key={id}
-            path={`/${head}/${path}`}
+            path={`/${head}${path}`}
             element={
               <SchemeBuilder
                 schemaSrc={src}

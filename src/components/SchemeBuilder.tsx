@@ -37,7 +37,8 @@ export const SchemeBuilder = ({
   const submitOrder = useSubmitOrder();
 
   const { parts, loading, error } = useProductParts(productId);
-  // console.log("parts", parts);
+  // console.log("parts:", JSON.stringify(parts, null, 2));
+  console.log("parts:", parts);
   const globalOrderParts = useAppSelector((state) => state.orders.parts);
   // console.log("globalOrderParts", globalOrderParts);
   const totalPartsInOrder = globalOrderParts.reduce(
@@ -129,7 +130,11 @@ export const SchemeBuilder = ({
                     position: "absolute",
                     top: `${pos.top}%`,
                     left: `${pos.left}%`,
-                    color: "rgba(0, 0, 255, 0.7)",
+                    color:
+                      item.alternativeSets &&
+                      Object.keys(item.alternativeSets).length > 0
+                        ? "rgba(255, 0, 0, 0.7)"
+                        : "rgba(0, 0, 255, 0.7)",
                     borderRadius: "5px",
                     py: "2px",
                     px: "2px",

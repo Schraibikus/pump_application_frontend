@@ -60,7 +60,7 @@ export const ProductGroupPage = () => {
             sx={{ breakInside: "avoid-column", width: "100%", my: 1 }}
             key={id}
             variant="contained"
-            onClick={() => navigate(`/${head}/${path}`)}
+            onClick={() => navigate(`/${head}${path}`)}
           >
             {name}
           </Button>
