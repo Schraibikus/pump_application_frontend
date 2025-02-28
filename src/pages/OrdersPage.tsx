@@ -22,6 +22,7 @@ export const OrdersPage = () => {
   const dispatch = useAppDispatch();
   const { orders, loading, error } = useAppSelector((state) => state.orders);
   const [openOrderId, setOpenOrderId] = useState<number | null>(null);
+  console.log(orders);
 
   useEffect(() => {
     dispatch(fetchOrders());
