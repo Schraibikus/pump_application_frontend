@@ -10,13 +10,15 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Pagination,
 } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
 import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
 import { fetchOrders, deleteOrder } from "@/store/modules/orders/thunk";
 import { ActiveOrdersEmpty } from "./ActiveOrdersEmpty";
-import { toast } from "react-toastify";
-import { exportOrderToPdf } from "@/utils/exportOrderToPdf";
+import { ExportDropdown } from "@/components/ExportDropdown";
 
 export const OrdersPage = () => {
   const dispatch = useAppDispatch();
@@ -102,15 +104,7 @@ export const OrdersPage = () => {
                   Заказ № {order.id} создан{" "}
                   {new Date(order.createdAt).toLocaleString()}
                 </Button>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() =>
-                    exportOrderToPdf(order, `order_${order.id}.pdf`)
-                  }
-                >
-                  Экспорт в PDF
-                </Button>
+                <ExportDropdown order={order} />
                 <Button
                   variant="contained"
                   color="error"
@@ -131,7 +125,7 @@ export const OrdersPage = () => {
                 >
                   {order.parts.length > 0 ? (
                     <TableContainer component={Paper}>
-                      <Table>
+                      <Table sx={{ minWidth: 800 }}>
                         <TableHead>
                           <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                             <TableCell sx={{ fontWeight: "bold" }}>
@@ -161,7 +155,9 @@ export const OrdersPage = () => {
                               {/* Заголовок группы */}
                               <TableRow
                                 key={productName}
-                                sx={{ backgroundColor: "#e0e0e0" }}
+                                sx={{
+                                  backgroundColor: "#e0e0e0",
+                                }}
                               >
                                 <TableCell
                                   colSpan={3}
@@ -175,7 +171,11 @@ export const OrdersPage = () => {
                                 <TableRow key={part.id}>
                                   <TableCell>{part.name}</TableCell>
                                   <TableCell>
-                                    {part.designation || "—"}
+                                    {part.designation && part.description
+                                      ? `${part.designation} (${part.description})`
+                                      : part.designation ||
+                                        part.description ||
+                                        "—"}
                                   </TableCell>
                                   <TableCell>{part.quantity}</TableCell>
                                 </TableRow>
@@ -196,6 +196,9 @@ export const OrdersPage = () => {
           <ActiveOrdersEmpty />
         )}
       </Box>
+      {orders && orders.length > 5 && (
+        <Pagination count={orders.length} showFirstButton showLastButton />
+      )}
     </Box>
   );
 };

@@ -48,9 +48,16 @@ export const exportOrderToPdf = (order: Order, fileName: string) => {
 
       // Добавляем детали
       parts.forEach((part) => {
+        // Объединяем designation и description в одной ячейке
+        const designationAndDescription = part.designation
+          ? part.description
+            ? `${part.designation} (${part.description})`
+            : part.designation
+          : part.description || "—";
+
         tableData.push([
           part.name,
-          part.designation || "—",
+          designationAndDescription,
           String(part.quantity),
         ]);
       });

@@ -98,7 +98,6 @@ export const SchemeBuilder = ({
           ? selectedItem.alternativeSets[selectedItem.selectedSet] // Обновляем данные
           : {}),
       };
-      console.log("newPart", newPart);
       dispatch(addPartToOrder(newPart));
       setOpen(false);
     }
