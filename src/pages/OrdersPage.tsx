@@ -24,7 +24,18 @@ export const OrdersPage = () => {
   const dispatch = useAppDispatch();
   const { orders, loading, error } = useAppSelector((state) => state.orders);
   const [openOrderId, setOpenOrderId] = useState<number | null>(null);
-  console.log(orders);
+  // console.log(orders);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10; // Количество заказов на странице
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
+    setCurrentPage(page);
+  };
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -80,19 +91,22 @@ export const OrdersPage = () => {
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        position: "relative",
+      }}
+    >
       <Box
         sx={{
           p: 4,
-          mt: 2,
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
           gap: 2,
         }}
       >
-        {orders && orders.length > 0 ? (
-          orders.map((order) => (
+        {currentOrders && currentOrders.length > 0 ? (
+          currentOrders.map((order) => (
             <Box key={order.id} sx={{ width: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Button
@@ -196,8 +210,26 @@ export const OrdersPage = () => {
           <ActiveOrdersEmpty />
         )}
       </Box>
-      {orders && orders.length > 5 && (
-        <Pagination count={orders.length} showFirstButton showLastButton />
+      {orders && orders.length > ordersPerPage && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            position: "fixed", // Закрепляем пагинацию внизу
+            bottom: 50, // Прижимаем к нижнему краю
+            py: 2, // Отступы сверху и снизу
+          }}
+        >
+          <Pagination
+            count={Math.ceil(orders.length / ordersPerPage)}
+            color="primary"
+            page={currentPage}
+            onChange={handlePageChange}
+            showFirstButton
+            showLastButton
+            sx={{ my: 2, pl: 4 }}
+          />
+        </Box>
       )}
     </Box>
   );
