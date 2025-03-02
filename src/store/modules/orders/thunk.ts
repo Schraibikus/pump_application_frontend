@@ -8,21 +8,14 @@ import {
   fetchSingleOrderApi,
 } from "@/store/modules/orders/apis";
 
-// Асинхронный чанк для получения списка заказов
+// Асинхронный чанк для получения списка продуктов
 export const fetchOrders = createAsyncThunk<
   Order[],
   void,
   { rejectValue: string }
->("orders/fetchOrders", async (_, { getState, rejectWithValue }) => {
-  const state = getState() as { orders: { isLoaded: boolean } };
-
-  // Если данные уже загружены, не выполняем запрос
-  if (state.orders.isLoaded) {
-    return rejectWithValue("Данные уже загружены");
-  }
-
+>("orders/fetchOrders", async (_, { rejectWithValue }) => {
   try {
-    return await fetchOrdersApi();
+    return await fetchOrdersApi(); // Теперь возвращает { orders: Orders[] }
   } catch (error) {
     if (error instanceof AxiosError) {
       return rejectWithValue(error.response?.data?.message || "Ошибка сервера");
@@ -31,65 +24,53 @@ export const fetchOrders = createAsyncThunk<
   }
 });
 
-// Асинхронный чанк для получения одного заказа
-export const fetchSingleOrder = createAsyncThunk<
-  Order,
-  number,
-  { rejectValue: string }
->("orders/fetchSingleOrder", async (orderId, { getState, rejectWithValue }) => {
-  const state = getState() as {
-    orders: { cachedOrders: Record<number, Order> };
-  };
-
-  // Если заказ уже загружен и есть в кэше, возвращаем его
-  if (state.orders.cachedOrders[orderId]) {
-    return state.orders.cachedOrders[orderId];
-  }
-
-  try {
-    const data = await fetchSingleOrderApi(orderId);
-    return data;
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      return rejectWithValue(error.response?.data?.message);
+export const fetchSingleOrder = createAsyncThunk<Order, number>(
+  "orders/fetchSingleOrder",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const data = await fetchSingleOrderApi(orderId);
+      return data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message);
+      }
+      return rejectWithValue("Неизвестная ошибка.");
     }
-    return rejectWithValue("Неизвестная ошибка.");
   }
-});
+);
 
-// Асинхронный чанк для создания заказа
-export const createOrder = createAsyncThunk<
-  Order,
-  Order,
-  { rejectValue: string }
->("orders/createOrder", async (order, { rejectWithValue }) => {
-  try {
-    const data = await createOrdersApi(order);
-    return data;
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      return rejectWithValue(error.response?.data?.message);
+export const createOrder = createAsyncThunk(
+  "orders/createOrder",
+  async (order: Order, { rejectWithValue }) => {
+    try {
+      const data = await createOrdersApi(order);
+      return data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message);
+      }
+      return rejectWithValue("Неизвестная ошибка.");
     }
-    return rejectWithValue("Неизвестная ошибка.");
   }
-});
+);
 
-// Асинхронный чанк для удаления заказа
-export const deleteOrder = createAsyncThunk<
-  number,
-  number,
-  { rejectValue: string }
->("orders/deleteOrder", async (orderId, { rejectWithValue }) => {
-  try {
-    const isDeleted = await deleteOrdersApi(orderId);
-    if (!isDeleted) {
-      return rejectWithValue("Не удалось удалить заказ");
+export const deleteOrder = createAsyncThunk(
+  "orders/deleteOrder",
+  async (orderId: number, { rejectWithValue }) => {
+    try {
+      const isDeleted = await deleteOrdersApi(orderId);
+      if (!isDeleted) {
+        // Если удаление не удалось, возвращаем ошибку
+        return rejectWithValue({ message: "Не удалось удалить заказ" });
+      }
+      return orderId; // Возвращаем ID удалённого заказа
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Возвращаем ошибку с данными от сервера
+        return rejectWithValue(error.response?.data);
+      }
+      // Возвращаем неизвестную ошибку
+      return rejectWithValue({ message: "Неизвестная ошибка" });
     }
-    return orderId; // Возвращаем ID удалённого заказа
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return rejectWithValue(error.response?.data?.message);
-    }
-    return rejectWithValue("Неизвестная ошибка");
   }
-});
+);

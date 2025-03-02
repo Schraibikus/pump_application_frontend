@@ -103,6 +103,7 @@ export const SchemeBuilder = ({
           ? selectedItem.alternativeSets[selectedItem.selectedSet]
           : {}),
       };
+      setQuantity(1);
       dispatch(addPartToOrder(newPart));
       setOpen(false);
     }

@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Typography, Pagination } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
@@ -9,19 +9,14 @@ import { OrderItem } from "@/pages/OrderItem";
 
 export const OrdersPage = () => {
   const dispatch = useAppDispatch();
-  const { orders, loading, error, isLoaded } = useAppSelector(
-    (state) => state.orders
-  );
+  const { orders, loading, error } = useAppSelector((state) => state.orders);
   const [openOrderId, setOpenOrderId] = useState<number | null>(null);
   // console.log(orders);
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10; // Количество заказов на странице
-  // Мемоизация текущих заказов для пагинации
-  const currentOrders = useMemo(() => {
-    const indexOfLastOrder = currentPage * ordersPerPage;
-    const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-    return orders.slice(indexOfFirstOrder, indexOfLastOrder);
-  }, [orders, currentPage, ordersPerPage]);
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
     page: number
@@ -29,12 +24,9 @@ export const OrdersPage = () => {
     setCurrentPage(page);
   };
 
-  // Загрузка данных только если они еще не загружены
   useEffect(() => {
-    if (!isLoaded) {
-      dispatch(fetchOrders());
-    }
-  }, [dispatch, isLoaded]);
+    dispatch(fetchOrders());
+  }, [dispatch]);
 
   const handleDeleteOrder = async (orderId: number) => {
     if (window.confirm("Вы уверены, что хотите удалить этот заказ?")) {
@@ -114,14 +106,14 @@ export const OrdersPage = () => {
           <ActiveOrdersEmpty />
         )}
       </Box>
-      {orders.length > ordersPerPage && (
+      {orders && orders.length > ordersPerPage && (
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
-            position: "fixed", // Закрепляем пагинацию внизу
-            bottom: 50, // Прижимаем к нижнему краю
-            py: 2, // Отступы сверху и снизу
+            position: "fixed",
+            bottom: 50,
+            py: 2,
           }}
         >
           <Pagination
