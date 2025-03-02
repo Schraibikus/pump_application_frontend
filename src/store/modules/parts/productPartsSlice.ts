@@ -6,12 +6,16 @@ interface ProductPartsState {
   parts: PartItem[];
   loading: boolean;
   error: string | null;
+  isLoaded: boolean; // Флаг, указывающий, были ли данные загружены
+  cachedParts: Record<number, PartItem[]>; // Кэшированные данные по productId
 }
 
 const initialState: ProductPartsState = {
   parts: [],
   loading: false,
   error: null,
+  isLoaded: false, // Изначально данные не загружены
+  cachedParts: {}, // Кэш для частей по productId
 };
 
 const productPartsSlice = createSlice({
@@ -27,6 +31,11 @@ const productPartsSlice = createSlice({
       .addCase(fetchProductParts.fulfilled, (state, action) => {
         state.loading = false;
         state.parts = action.payload;
+        state.isLoaded = true;
+
+        // Кэшируем данные по productId
+        const productId = action.meta.arg; // productId передается как аргумент в thunk
+        state.cachedParts[productId] = action.payload;
       })
       .addCase(fetchProductParts.rejected, (state, action) => {
         state.loading = false;

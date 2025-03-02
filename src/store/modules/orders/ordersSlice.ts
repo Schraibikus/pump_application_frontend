@@ -13,6 +13,8 @@ interface OrdersState {
   parts: PartItem[];
   loading: boolean;
   error: string | null;
+  isLoaded: boolean; // Флаг, указывающий, были ли данные загружены
+  cachedOrders: Record<number, Order>; // Кэшированные данные по orderId
 }
 
 const initialState: OrdersState = {
@@ -21,6 +23,8 @@ const initialState: OrdersState = {
   singleOrder: null,
   loading: false,
   error: null,
+  isLoaded: false, // Изначально данные не загружены
+  cachedOrders: {}, // Кэш для заказов по orderId
 };
 
 const ordersSlice = createSlice({
@@ -38,7 +42,7 @@ const ordersSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    //создание заказа
+    // Создание заказа
     builder
       .addCase(createOrder.pending, (state) => {
         state.loading = true;
@@ -47,13 +51,14 @@ const ordersSlice = createSlice({
       .addCase(createOrder.fulfilled, (state, action: PayloadAction<Order>) => {
         state.loading = false;
         state.orders = [...state.orders, action.payload];
+        state.cachedOrders[action.payload.id] = action.payload; // Кэшируем новый заказ
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) || "Ошибка создания заказа";
       });
 
-    //получение списка заказов
+    // Получение списка заказов
     builder
       .addCase(fetchOrders.pending, (state) => {
         state.loading = true;
@@ -64,6 +69,12 @@ const ordersSlice = createSlice({
         (state, action: PayloadAction<Order[]>) => {
           state.loading = false;
           state.orders = action.payload;
+          state.isLoaded = true; // Устанавливаем флаг, что данные загружены
+
+          // Кэшируем заказы
+          action.payload.forEach((order) => {
+            state.cachedOrders[order.id] = order;
+          });
         }
       )
       .addCase(fetchOrders.rejected, (state, action) => {
@@ -72,7 +83,7 @@ const ordersSlice = createSlice({
           (action.payload as string) || "Ошибка загрузки данных заказов";
       });
 
-    //получение одного заказа
+    // Получение одного заказа
     builder
       .addCase(fetchSingleOrder.pending, (state) => {
         state.loading = true;
@@ -83,6 +94,7 @@ const ordersSlice = createSlice({
         (state, action: PayloadAction<Order>) => {
           state.loading = false;
           state.singleOrder = action.payload;
+          state.cachedOrders[action.payload.id] = action.payload; // Кэшируем заказ
         }
       )
       .addCase(fetchSingleOrder.rejected, (state, action) => {
@@ -90,6 +102,7 @@ const ordersSlice = createSlice({
         state.error =
           (action.payload as string) || "Ошибка загрузки данных заказа";
       });
+
     // Удаление заказа
     builder
       .addCase(deleteOrder.pending, (state) => {
@@ -100,10 +113,11 @@ const ordersSlice = createSlice({
         deleteOrder.fulfilled,
         (state, action: PayloadAction<number>) => {
           state.loading = false;
-          // Удаляем заказ из списка
+          // Удаляем заказ из списка и кэша
           state.orders = state.orders.filter(
             (order) => order.id !== action.payload
           );
+          delete state.cachedOrders[action.payload];
         }
       )
       .addCase(deleteOrder.rejected, (state, action) => {

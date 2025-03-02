@@ -28,14 +28,14 @@ const ScrollToTopButton = () => {
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} // Плавная прокрутка
       sx={{
         position: "fixed",
-        right: '3%',
-        bottom: '10%',
+        right: "3%",
+        bottom: "10%",
         zIndex: 50,
         opacity: isBackButtonVisible ? 1 : 0, // Плавное появление
         transition: "opacity 0.3s ease-in-out", // Анимация
         pointerEvents: isBackButtonVisible ? "auto" : "none", // Отключаем клики, когда кнопка не видна
         minWidth: "auto", // Убираем лишние отступы
-        padding: "10px", // Уменьшаем padding
+        p: 2.5, // Уменьшаем padding
       }}
     >
       <ArrowUpwardIcon /> {/* Иконка стрелки вверх */}

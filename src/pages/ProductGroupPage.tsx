@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { useAppSelector } from "@/hooks/useReduxHooks";
+import { useMemo } from "react";
 
 export const ProductGroupPage = () => {
   const navigate = useNavigate();
@@ -8,6 +9,11 @@ export const ProductGroupPage = () => {
   const { products, loading, error } = useAppSelector(
     (state) => state.products
   );
+
+  // Мемоизация фильтрации продуктов
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => product.head === Number(head));
+  }, [products, head]); // Пересчитываем только при изменении products или head
 
   if (loading) {
     return (
@@ -42,10 +48,10 @@ export const ProductGroupPage = () => {
     );
   }
 
-  // Фильтруем изделия по head
-  const filteredProducts = products.filter(
-    (product) => product.head === Number(head)
-  );
+  // // Фильтруем изделия по head
+  // const filteredProducts = products.filter(
+  //   (product) => product.head === Number(head)
+  // );
 
   return (
     <Box

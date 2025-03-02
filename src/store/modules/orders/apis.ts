@@ -1,5 +1,5 @@
-import { api } from "@/store/axios";
 import axios from "axios";
+import { api } from "@/store/axios";
 import { Order } from "@/types";
 
 export const fetchOrdersApi = async (): Promise<Order[]> => {

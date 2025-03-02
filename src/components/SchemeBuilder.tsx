@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; // Добавлен useMemo
 import {
   Box,
   Button,
@@ -17,7 +17,7 @@ import { Add, Remove } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { PartItem } from "@/types";
 import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
-import { fetchProductParts } from "@/store/modules/products/thunk";
+import { fetchProductParts } from "@/store/modules/parts/thunk";
 import ScrollToTopButton from "./ScrollToTopButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -55,7 +55,7 @@ export const SchemeBuilder = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { parts, loading, error } = useAppSelector(
+  const { parts, loading, error, cachedParts } = useAppSelector(
     (state) => state.productParts
   );
   const {
@@ -64,12 +64,17 @@ export const SchemeBuilder = ({
     error: orderError,
   } = useAppSelector((state) => state.orders);
 
+  // Используем кэшированные данные, если они есть
+  const currentParts = cachedParts[productId] || parts;
+
   useEffect(() => {
-    dispatch(fetchProductParts(productId));
-  }, [dispatch, productId]);
+    // Загружаем данные только если их нет в кэше
+    if (!cachedParts[productId]) {
+      dispatch(fetchProductParts(productId));
+    }
+  }, [dispatch, productId, cachedParts]);
 
   const handleOpen = (item: PartItem) => {
-    // Проверяем, есть ли в текущей части набор с lastSelectedSet
     const initialSelectedSet = item.alternativeSets?.[lastSelectedSet]
       ? lastSelectedSet
       : "";
@@ -93,9 +98,9 @@ export const SchemeBuilder = ({
         parentProductId: productId,
         productName,
         productDrawing,
-        selectedSet: selectedItem.selectedSet, // Сохраняем выбранный набор
+        selectedSet: selectedItem.selectedSet,
         ...(selectedItem.selectedSet && selectedItem.alternativeSets
-          ? selectedItem.alternativeSets[selectedItem.selectedSet] // Обновляем данные
+          ? selectedItem.alternativeSets[selectedItem.selectedSet]
           : {}),
       };
       dispatch(addPartToOrder(newPart));
@@ -182,7 +187,7 @@ export const SchemeBuilder = ({
         <Box sx={{ position: "relative", display: "inline-block" }}>
           <img src={schemaSrc} alt="Scheme" width={`${productWidth}%`} />
 
-          {parts.map((item) => {
+          {currentParts.map((item) => {
             const positions = [
               { top: item.positioningTop, left: item.positioningLeft },
               { top: item.positioningTop2, left: item.positioningLeft2 },
@@ -268,7 +273,6 @@ export const SchemeBuilder = ({
                     <Typography>Рисунок: {selectedItem.drawing}</Typography>
                   )}
 
-                  {/* Добавляем выбор alternativeSets, если они есть */}
                   {hasAlternativeSets && (
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="subtitle1" gutterBottom>
@@ -289,7 +293,7 @@ export const SchemeBuilder = ({
                               selectedSet,
                               ...(prev?.alternativeSets?.[selectedSet] || {}),
                             }));
-                            setLastSelectedSet(selectedSet); // Сохраняем выбранный набор глобально
+                            setLastSelectedSet(selectedSet);
                           }}
                           label="Переменные данные"
                           sx={{ borderRadius: "4px" }}
@@ -397,7 +401,7 @@ export const SchemeBuilder = ({
                         borderBottom: "1px solid #e0e0e0",
                         padding: 2,
                         "&:last-child": {
-                          borderBottom: "none", // Убираем границу у последнего элемента
+                          borderBottom: "none",
                         },
                       }}
                     >

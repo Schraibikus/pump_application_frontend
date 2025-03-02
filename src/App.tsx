@@ -12,12 +12,14 @@ import { ProductGroupPage } from "./pages/ProductGroupPage";
 
 const App = () => {
   const dispatch = useAppDispatch();
-  const products = useAppSelector((state) => state.products.products);
+  const { products, isLoaded } = useAppSelector((state) => state.products);
   // console.log(products);
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    if (!isLoaded) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, isLoaded]);
 
   return (
     <Routes>
