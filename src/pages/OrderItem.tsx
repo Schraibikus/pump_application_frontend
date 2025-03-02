@@ -9,32 +9,29 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Modal,
 } from "@mui/material";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { ExportDropdown } from "@/components/ExportDropdown";
 import { Order } from "@/types";
 
 // Компонент для отображения одного заказа
 export const OrderItem = ({
   order,
-  openOrderId,
-  setOpenOrderId,
   handleDeleteOrder,
 }: {
   order: Order;
-  openOrderId: number | null;
-  setOpenOrderId: (orderId: number | null) => void;
   handleDeleteOrder: (orderId: number) => void;
 }) => {
-  const isOpen = openOrderId === order.id;
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   return (
     <Box key={order.id} sx={{ width: "100%" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <Button
-          variant="contained"
-          onClick={() => setOpenOrderId(isOpen ? null : order.id)}
-        >
+        <Button variant="contained" onClick={handleOpenModal}>
           Заказ № {order.id} создан {new Date(order.createdAt).toLocaleString()}
         </Button>
         <ExportDropdown order={order} />
@@ -47,15 +44,39 @@ export const OrderItem = ({
         </Button>
       </Box>
 
-      {isOpen && (
+      {/* Модальное окно для отображения деталей заказа */}
+      <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           sx={{
-            border: "1px solid #ccc",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 0,
+            p: 4,
             borderRadius: 2,
-            mt: 2,
-            width: "100%",
           }}
         >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography>Заказ № {order.id}</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <ExportDropdown order={order} />
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => handleDeleteOrder(order.id)}
+              >
+                Удалить заказ
+              </Button>
+            </Box>
+          </Box>
           {order.parts.length > 0 ? (
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 800 }}>
@@ -82,18 +103,11 @@ export const OrderItem = ({
                     )
                   ).map(([productName, parts]) => (
                     <Fragment key={productName}>
-                      {/* Заголовок группы */}
-                      <TableRow
-                        key={productName}
-                        sx={{
-                          backgroundColor: "#e0e0e0",
-                        }}
-                      >
+                      <TableRow sx={{ backgroundColor: "#e0e0e0" }}>
                         <TableCell colSpan={3} sx={{ fontWeight: "bold" }}>
                           {productName}:
                         </TableCell>
                       </TableRow>
-                      {/* Детали внутри группы */}
                       {parts.map((part) => (
                         <TableRow key={part.id}>
                           <TableCell>{part.name}</TableCell>
@@ -114,7 +128,7 @@ export const OrderItem = ({
             <Typography sx={{ p: 2 }}>Нет деталей в заказе</Typography>
           )}
         </Box>
-      )}
+      </Modal>
     </Box>
   );
 };

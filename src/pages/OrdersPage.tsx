@@ -97,8 +97,8 @@ export const OrdersPage = () => {
             <OrderItem
               key={order.id}
               order={order}
-              openOrderId={openOrderId}
-              setOpenOrderId={setOpenOrderId}
+              // openOrderId={openOrderId}
+              // setOpenOrderId={setOpenOrderId}
               handleDeleteOrder={handleDeleteOrder}
             />
           ))

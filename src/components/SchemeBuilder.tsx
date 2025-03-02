@@ -497,6 +497,7 @@ export const SchemeBuilder = ({
                 variant="contained"
                 color="primary"
                 onClick={handleSubmitOrder}
+                disabled={!globalOrderParts.length}
               >
                 Отправить заказ
               </Button>
