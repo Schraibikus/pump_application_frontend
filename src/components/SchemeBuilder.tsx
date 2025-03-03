@@ -63,6 +63,7 @@ export const SchemeBuilder = ({
     loading: orderLoading,
     error: orderError,
   } = useAppSelector((state) => state.orders);
+  // console.log(globalOrderParts);
 
   // Используем кэшированные данные, если они есть
   const currentParts = cachedParts[productId] || parts;
@@ -94,7 +95,7 @@ export const SchemeBuilder = ({
     if (selectedItem) {
       const newPart = {
         ...selectedItem,
-        quantity,
+        quantity: 1, // Всегда добавляем 1, существующие будут суммироваться
         parentProductId: productId,
         productName,
         productDrawing,
@@ -103,6 +104,7 @@ export const SchemeBuilder = ({
           ? selectedItem.alternativeSets[selectedItem.selectedSet]
           : {}),
       };
+
       setQuantity(1);
       dispatch(addPartToOrder(newPart));
       setOpen(false);
@@ -172,14 +174,15 @@ export const SchemeBuilder = ({
           На страницу изделия
         </Button>
 
-        <Button
-          variant="contained"
-          onClick={() => setOrderOpen(true)}
-          sx={{ m: 2, alignSelf: "flex-start" }}
-          disabled={!hasOrder}
-        >
-          {`Просмотреть заказ: наименований-(${totalItemsInOrder}) количество-(${totalPartsInOrder})`}
-        </Button>
+        {hasOrder && (
+          <Button
+            variant="contained"
+            onClick={() => setOrderOpen(true)}
+            sx={{ m: 2, alignSelf: "flex-start" }}
+          >
+            {`Просмотреть заказ: наименований-(${totalItemsInOrder}) количество-(${totalPartsInOrder})`}
+          </Button>
+        )}
 
         <ScrollToTopButton />
       </Box>
@@ -321,26 +324,34 @@ export const SchemeBuilder = ({
                       value={quantity}
                       onChange={(e) => setQuantity(Number(e.target.value))}
                       sx={{ mt: 2 }}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={handleDecrement} size="small">
-                              <Remove />
-                            </IconButton>
-                            <IconButton onClick={handleIncrement} size="small">
-                              <Add />
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                        sx: {
-                          "& input[type=number]": {
-                            MozAppearance: "textfield",
-                          },
-                          "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
-                            {
-                              WebkitAppearance: "none",
-                              margin: 0,
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={handleDecrement}
+                                size="small"
+                              >
+                                <Remove />
+                              </IconButton>
+                              <IconButton
+                                onClick={handleIncrement}
+                                size="small"
+                              >
+                                <Add />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                          sx: {
+                            "& input[type=number]": {
+                              MozAppearance: "textfield",
                             },
+                            "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+                              {
+                                WebkitAppearance: "none",
+                                margin: 0,
+                              },
+                          },
                         },
                       }}
                     />
@@ -376,14 +387,23 @@ export const SchemeBuilder = ({
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 width: 600,
+                maxHeight: "80vh", // Ограничиваем высоту модального окна
                 bgcolor: "background.paper",
                 boxShadow: 24,
                 p: 4,
                 borderRadius: 2,
+                display: "flex",
+                flexDirection: "column",
               }}
             >
               <Typography variant="h6">Ваш заказ</Typography>
-              <Box>
+              <Box
+                sx={{
+                  overflowY: "auto", // Добавляем вертикальный скролл
+                  flexGrow: 1, // Растягиваем контейнер на доступное пространство
+                  mt: 2,
+                }}
+              >
                 {globalOrderParts.map((part) => {
                   const hasSelectedSet =
                     part.selectedSet && part.alternativeSets;

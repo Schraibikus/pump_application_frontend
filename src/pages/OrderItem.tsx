@@ -44,7 +44,6 @@ export const OrderItem = ({
         </Button>
       </Box>
 
-      {/* Модальное окно для отображения деталей заказа */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           sx={{
@@ -52,10 +51,14 @@ export const OrderItem = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
+            width: "60vw",
+            maxHeight: "80vh", // Ограничиваем высоту модального окна
             bgcolor: "background.paper",
-            boxShadow: 0,
+            boxShadow: 24,
             p: 4,
             borderRadius: 2,
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Box
@@ -63,6 +66,9 @@ export const OrderItem = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              overflowY: "auto", // Добавляем вертикальный скролл
+              flexGrow: 1, // Растягиваем контейнер на доступное пространство
+              mt: 2,
             }}
           >
             <Typography>Заказ № {order.id}</Typography>
@@ -77,7 +83,7 @@ export const OrderItem = ({
               </Button>
             </Box>
           </Box>
-          {order.parts.length > 0 ? (
+          {order.parts && order.parts.length > 0 ? (
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 800 }}>
                 <TableHead>

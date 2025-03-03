@@ -28,10 +28,27 @@ const ordersSlice = createSlice({
   initialState,
   reducers: {
     addPartToOrder: (state, action: PayloadAction<PartItem>) => {
-      state.parts.push(action.payload);
+      const existingPart = state.parts.find(
+        (part) =>
+          part.id === action.payload.id &&
+          part.selectedSet === action.payload.selectedSet
+      );
+
+      if (existingPart) {
+        existingPart.quantity += action.payload.quantity;
+      } else {
+        state.parts.push(action.payload);
+      }
     },
     removePartFromOrder: (state, action: PayloadAction<number>) => {
-      state.parts = state.parts.filter((part) => part.id !== action.payload);
+      const index = state.parts.findIndex((part) => part.id === action.payload);
+      if (index !== -1) {
+        if (state.parts[index].quantity > 1) {
+          state.parts[index].quantity -= 1;
+        } else {
+          state.parts.splice(index, 1);
+        }
+      }
     },
     clearOrder: (state) => {
       state.parts = [];
