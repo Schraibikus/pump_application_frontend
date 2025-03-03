@@ -5,7 +5,7 @@ import { Product } from "@/types";
 export const fetchProductsApi = async (): Promise<Product[]> => {
   try {
     const { data } = await api.get<Product[]>("/api/products");
-    console.log("Данные успешно загружены:", data); // Логирование для отладки
+    // console.log("Данные успешно загружены:", data);
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
