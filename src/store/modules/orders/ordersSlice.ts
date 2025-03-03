@@ -35,20 +35,15 @@ const ordersSlice = createSlice({
       );
 
       if (existingPart) {
+        // Если часть уже есть в заказе, увеличиваем её количество
         existingPart.quantity += action.payload.quantity;
       } else {
+        // Если части нет, добавляем новую запись
         state.parts.push(action.payload);
       }
     },
     removePartFromOrder: (state, action: PayloadAction<number>) => {
-      const index = state.parts.findIndex((part) => part.id === action.payload);
-      if (index !== -1) {
-        if (state.parts[index].quantity > 1) {
-          state.parts[index].quantity -= 1;
-        } else {
-          state.parts.splice(index, 1);
-        }
-      }
+      state.parts = state.parts.filter((part) => part.id !== action.payload);
     },
     clearOrder: (state) => {
       state.parts = [];

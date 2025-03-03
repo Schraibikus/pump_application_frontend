@@ -95,7 +95,7 @@ export const SchemeBuilder = ({
     if (selectedItem) {
       const newPart = {
         ...selectedItem,
-        quantity: 1, // Всегда добавляем 1, существующие будут суммироваться
+        quantity,
         parentProductId: productId,
         productName,
         productDrawing,
