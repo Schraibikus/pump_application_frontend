@@ -58,6 +58,7 @@ export const SchemeBuilder = ({
   const { parts, loading, error, cachedParts } = useAppSelector(
     (state) => state.productParts
   );
+  // console.log(parts);
   const {
     parts: globalOrderParts,
     loading: orderLoading,
@@ -123,6 +124,7 @@ export const SchemeBuilder = ({
       alert("Заказ успешно отправлен!");
       dispatch(clearOrder());
       setOrderOpen(false);
+      navigate("/");
     } catch (error) {
       console.error("Ошибка при отправке заказа:", error);
     }
@@ -157,14 +159,21 @@ export const SchemeBuilder = ({
   return (
     <Box
       sx={{
-        display: "flex",
-        justifyContent: "center",
-        textAlign: "center",
+        position: "relative",
         mt: 5,
+        px: 5,
       }}
     >
       <Box
-        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          position: "fixed",
+          top: 100,
+          left: 0,
+          zIndex: 10,
+        }}
       >
         <Button
           variant="contained"
@@ -175,19 +184,29 @@ export const SchemeBuilder = ({
         </Button>
 
         {hasOrder && (
-          <Button
-            variant="contained"
-            onClick={() => setOrderOpen(true)}
-            sx={{ m: 2, alignSelf: "flex-start" }}
-          >
-            {`Просмотреть заказ: наименований-(${totalItemsInOrder}) количество-(${totalPartsInOrder})`}
-          </Button>
+          <>
+            <Button
+              variant="contained"
+              onClick={() => setOrderOpen(true)}
+              sx={{ m: 2, alignSelf: "flex-start" }}
+            >
+              Просмотреть заказ
+            </Button>
+            <Typography sx={{ ml: 2 }}>
+              {`Наименований - (${totalItemsInOrder})`}
+            </Typography>
+            <Typography sx={{ ml: 2 }}>
+              {`Количество - (${totalPartsInOrder})`}
+            </Typography>
+          </>
         )}
-
-        <ScrollToTopButton />
       </Box>
       <ScrollToTopButton />
-      <Box sx={{ mt: 2 }}>
+
+      <Box sx={{ mt: 2, textAlign: "center" }}>
+        <Typography sx={{ fontSize: 20, mb: 2 }}>
+          Рисунок № {productDrawing} {productName}
+        </Typography>
         <Box sx={{ position: "relative", display: "inline-block" }}>
           <img src={schemaSrc} alt="Scheme" width={`${productWidth}%`} />
 
