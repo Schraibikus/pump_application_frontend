@@ -12,8 +12,10 @@ import {
   Select,
   MenuItem,
   InputAdornment,
+  Tooltip,
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
+import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
 import { PartItem } from "@/types";
 import { useAppDispatch, useAppSelector } from "@/hooks/useReduxHooks";
@@ -47,7 +49,6 @@ export const SchemeBuilder = ({
   const [orderOpen, setOrderOpen] = useState(false);
   const [quantity, setQuantity] = useState<number>(1);
   const [lastSelectedSet, setLastSelectedSet] = useState<string>("");
-  
 
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () =>
@@ -312,9 +313,22 @@ export const SchemeBuilder = ({
 
                   {hasAlternativeSets && (
                     <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle1" gutterBottom>
-                        Выберите переменные данные:
-                      </Typography>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography gutterBottom>
+                          Выберите переменные данные:
+                        </Typography>
+                        {hasAlternativeSets && !selectedItem?.selectedSet && (
+                          <Tooltip
+                            title="Выберите переменные данные перед добавлением в заказ"
+                            arrow
+                          >
+                            <InfoIcon
+                              color="error"
+                              sx={{ ml: 1, mb: 1, verticalAlign: "middle" }}
+                            />
+                          </Tooltip>
+                        )}
+                      </Box>
                       <FormControl fullWidth>
                         <InputLabel id="alternative-sets-select-label">
                           Переменные данные
@@ -333,7 +347,9 @@ export const SchemeBuilder = ({
                             setLastSelectedSet(selectedSet);
                           }}
                           label="Переменные данные"
-                          sx={{ borderRadius: "4px" }}
+                          sx={{
+                            borderRadius: "4px",
+                          }}
                         >
                           <MenuItem value="">
                             <em>Выберите переменные данные</em>

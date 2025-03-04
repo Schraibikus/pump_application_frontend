@@ -48,22 +48,22 @@ export const ProductGroupPage = () => {
     );
   }
 
-  // // Фильтруем изделия по head
-  // const filteredProducts = products.filter(
-  //   (product) => product.head === Number(head)
-  // );
-
   return (
     <Box
       sx={{
-        columnCount: 2,
+        columnCount: 3,
         p: 4,
       }}
     >
       {filteredProducts.length > 0 ? (
         filteredProducts.map(({ name, path, id, head }) => (
           <Button
-            sx={{ breakInside: "avoid-column", width: "100%", my: 1 }}
+            sx={{
+              breakInside: "avoid-column",
+              width: "100%",
+              my: 1,
+              "&:last-child": { color: "red" },
+            }}
             key={id}
             variant="contained"
             onClick={() => navigate(`/${head}${path}`)}
