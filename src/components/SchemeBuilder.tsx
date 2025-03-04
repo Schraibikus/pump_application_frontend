@@ -93,6 +93,11 @@ export const SchemeBuilder = ({
     setOpen(false);
   };
 
+  useEffect(() => {
+    // Сбрасываем количество при изменении выбранной части
+    setQuantity(1);
+  }, [selectedItem]);
+
   const handleAddToOrder = () => {
     if (selectedItem) {
       const newPart = {
