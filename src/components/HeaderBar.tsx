@@ -1,6 +1,6 @@
 import { Box, Tabs, Tab } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 export const HeaderBar = () => {
@@ -8,6 +8,24 @@ export const HeaderBar = () => {
   const location = useLocation();
 
   const [tabValue, setTabValue] = useState(0);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
+
+  // Обработчик скролла
+  const handleScroll = useCallback(() => {
+    const scrollPosition = window.scrollY || document.documentElement.scrollTop;
+    if (scrollPosition > 20) {
+      setIsHeaderVisible(true);
+    } else {
+      setIsHeaderVisible(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
   useEffect(() => {
     if (location.pathname.startsWith("/1")) {
@@ -64,7 +82,24 @@ export const HeaderBar = () => {
         height: 70,
         zIndex: 50,
         backgroundImage: "url(/png/tile_background.png)",
-        // borderBottom: "2px solid rgba(0, 0, 255, 0.7)",
+        backdropFilter: isHeaderVisible ? "blur(5px)" : "none", // Размытие при скролле
+        WebkitBackdropFilter: isHeaderVisible ? "blur(5px)" : "none", // Для Safari
+        transition: "backdrop-filter 0.3s ease-in-out",
+        ...(isHeaderVisible && {
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            borderRadius: "inherit",
+            background:
+              "linear-gradient(to top, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0))",
+            opacity: 1,
+            transition: "opacity 0.3s ease-in-out",
+          },
+        }),
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "center" }}>
