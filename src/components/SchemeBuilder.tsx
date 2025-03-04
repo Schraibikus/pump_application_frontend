@@ -124,7 +124,7 @@ export const SchemeBuilder = ({
       alert("Заказ успешно отправлен!");
       dispatch(clearOrder());
       setOrderOpen(false);
-      navigate("/");
+      navigate("/orderDone");
     } catch (error) {
       console.error("Ошибка при отправке заказа:", error);
     }

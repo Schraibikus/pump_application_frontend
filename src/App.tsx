@@ -9,6 +9,7 @@ import { fetchProducts } from "./store/modules/products/thunk";
 import { OrdersPage } from "./pages/OrdersPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProductGroupPage } from "./pages/ProductGroupPage";
+import { OrderDone } from "./pages/OrderDone";
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -43,6 +44,7 @@ const App = () => {
         ))}
         <Route path="/:head" element={<ProductGroupPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orderDone" element={<OrderDone />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
