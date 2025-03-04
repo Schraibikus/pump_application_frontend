@@ -47,6 +47,7 @@ export const SchemeBuilder = ({
   const [orderOpen, setOrderOpen] = useState(false);
   const [quantity, setQuantity] = useState<number>(1);
   const [lastSelectedSet, setLastSelectedSet] = useState<string>("");
+  
 
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () =>
@@ -110,6 +111,14 @@ export const SchemeBuilder = ({
       dispatch(addPartToOrder(newPart));
       setOpen(false);
     }
+  };
+
+  const handleConfirmAddToOrder = () => {
+    if (hasAlternativeSets && !selectedItem?.selectedSet) {
+      alert("Выберите переменные данные перед добавлением в заказ!");
+      return;
+    }
+    handleAddToOrder();
   };
 
   const handleSubmitOrder = async () => {
@@ -378,8 +387,11 @@ export const SchemeBuilder = ({
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={handleAddToOrder}
+                        onClick={handleConfirmAddToOrder}
                         sx={{ mt: 2, mr: 2 }}
+                        disabled={
+                          hasAlternativeSets && !selectedItem.selectedSet
+                        }
                       >
                         Добавить в заказ
                       </Button>
