@@ -1,11 +1,13 @@
-import { Box, Link } from "@mui/material";
+import { Box } from "@mui/material";
+import { Link } from "react-router-dom"; // Используем Link из react-router-dom
 
 export const MainPage = () => {
   return (
     <Box
       sx={{ display: "flex", justifyContent: "center", gap: 4, p: 4, mt: 2 }}
     >
-      <Link href="/1">
+      <Link to="/1">
+        {" "}
         <img
           src="/png/pump_main_01.png"
           alt="logo"

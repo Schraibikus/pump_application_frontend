@@ -11,7 +11,7 @@ export const Footer = () => {
         position: "fixed",
         bottom: 0,
         zIndex: 50,
-        backgroundImage: "url(/png/tile_background.png)",
+        backgroundImage: "url(/png/tile_background_4.png)",
       }}
     >
       <Typography sx={{ fontSize: 14, fontWeight: 700, color: "gray" }}>
